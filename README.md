@@ -1,7 +1,3 @@
-Here's a basic **README.md** for your generative AI platform:
-
----
-
 # **Generative AI Platform for Synthetic Synesthesia**
 
 This platform is designed to let users experience and compose multimedia art through synthetic synesthesia, where inputs like text, music, and images are transformed into corresponding outputs (e.g., visuals, sounds, tactile sensations). The platform leverages state-of-the-art AI models to generate art, sounds, and more across different modalities.
