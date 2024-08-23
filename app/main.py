@@ -1,37 +1,34 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
+from .utils.processing import save_file
+from .services.text_service import generate_visual_from_text
+from .services.image_service import generate_sound_from_image
+from .services.music_service import generate_visual_from_music
 
-# Import the services for each modality
-from app.services.text_service import generate_visual_from_text
-from app.services.image_service import generate_sound_from_image
-from app.services.music_service import generate_visual_from_music
+@api_router.post("/upload-text/")
+async def upload_text(text: str):
+    file_name = f"text_{hash(text)}.txt"
+    file_path = save_file(text.encode(), file_name, "data/inputs/text/")
+    return {"file_name": file_name, "file_path": file_path}
 
-api_router = APIRouter()
+@api_router.post("/upload-image/")
+async def upload_image(image: UploadFile = File(...)):
+    file_name = image.filename
+    file_content = await image.read()
+    file_path = save_file(file_content, file_name, "data/inputs/images/")
+    return {"file_name": file_name, "file_path": file_path}
 
-# Schemas for input data
-class TextInput(BaseModel):
-    text: str
+@api_router.post("/upload-music/")
+async def upload_music(music: UploadFile = File(...)):
+    file_name = music.filename
+    file_content = await music.read()
+    file_path = save_file(file_content, file_name, "data/inputs/music/")
+    return {"file_name": file_name, "file_path": file_path}
 
-class ImageInput(BaseModel):
-    image_url: str
-
-class MusicInput(BaseModel):
-    music_url: str
-
-# Text to Visual
-@api_router.post("/text-to-visual/")
-async def text_to_visual(input: TextInput):
-    visual = generate_visual_from_text(input.text)
-    return {"visual_output": visual}
-
-# Image to Sound
-@api_router.post("/image-to-sound/")
-async def image_to_sound(input: ImageInput):
-    sound = generate_sound_from_image(input.image_url)
-    return {"sound_output": sound}
-
-# Music to Visual
-@api_router.post("/music-to-visual/")
-async def music_to_visual(input: MusicInput):
-    visual = generate_visual_from_music(input.music_url)
-    return {"visual_output": visual}
+@api_router.get("/download-output/")
+async def download_output(file_name: str):
+    try:
+        file_path = get_file_path(file_name, "data/outputs/")
+        return FileResponse(file_path)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="File not found")
