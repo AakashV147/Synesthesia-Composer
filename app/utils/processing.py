@@ -1,18 +1,20 @@
-import os
-from pathlib import Path
+import base64
+import numpy as np
 
-# Utility to save input files
-def save_file(file_content, file_name: str, directory: str):
-    Path(directory).mkdir(parents=True, exist_ok=True)
-    file_path = os.path.join(directory, file_name)
-    with open(file_path, 'wb') as f:
-        f.write(file_content)
-    return file_path
+def encode_image_to_base64(image: np.ndarray) -> str:
+    """Encodes a numpy array image to a base64 string."""
+    image_pil = Image.fromarray(image)
+    buffered = io.BytesIO()
+    image_pil.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()
 
-# Utility to retrieve files
-def get_file_path(file_name: str, directory: str):
-    file_path = os.path.join(directory, file_name)
-    if os.path.exists(file_path):
-        return file_path
-    else:
-        raise FileNotFoundError(f"File {file_name} not found in {directory}")
+def decode_base64_to_image(base64_str: str) -> np.ndarray:
+    """Decodes a base64 string to a numpy array image."""
+    image_data = base64.b64decode(base64_str)
+    image_pil = Image.open(io.BytesIO(image_data))
+    return np.array(image_pil)
+
+def convert_to_wav_format(sound_data: np.ndarray) -> bytes:
+    """Converts numpy array sound data to WAV format bytes."""
+    # Placeholder for actual WAV file creation from numpy array
+    pass
