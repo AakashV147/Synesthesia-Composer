@@ -1,6 +1,10 @@
-fastapi
-uvicorn
-transformers
-torch
-numpy
-Pillow
+torch==2.0.0              # PyTorch for neural networks
+torchvision==0.15.1       # Image processing library for PyTorch
+fastapi==0.95.1           # FastAPI framework for serving the model
+uvicorn==0.22.0           # ASGI server for FastAPI
+Pillow==9.4.0             # Image processing (used by torchvision)
+numpy==1.23.5             # Array manipulation
+transformers==4.30.0      # For text embeddings (if using models like BERT, GPT)
+scikit-learn==1.2.2       # For evaluation metrics (optional)
+tqdm==4.65.0              # Progress bar for loops
+pydantic==1.10.8          # Data validation for FastAPI
