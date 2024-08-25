@@ -1,10 +1,11 @@
-from fastapi import UploadFile, File, HTTPException
+from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
-from .utils.processing import save_file
-from .services.text_service import generate_visual_from_text
-from .services.image_service import generate_sound_from_image
-from .services.music_service import generate_visual_from_music
+from .utils.processing import save_file, get_file_path  # Ensure get_file_path is implemented
 
+# Create an APIRouter instance
+api_router = APIRouter()
+
+# Define routes using the APIRouter instance
 @api_router.post("/upload-text/")
 async def upload_text(text: str):
     file_name = f"text_{hash(text)}.txt"
@@ -32,3 +33,35 @@ async def download_output(file_name: str):
         return FileResponse(file_path)
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="File not found")
+
+# Create the FastAPI app and include the router
+app = FastAPI()
+app.include_router(api_router)
+
+app = FastAPI()
+
+@app.post("/train-music-to-visual/")
+async def train_music_to_visual():
+    try:
+        train_and_save_music_to_visual_model()
+        return {"detail": "Model trained and saved successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate-visual/")
+async def generate_visual(music_input: UploadFile = File(...)):
+    try:
+        # Save the uploaded file temporarily
+        file_path = f"temp_{music_input.filename}"
+        with open(file_path, "wb") as f:
+            f.write(await music_input.read())
+        
+        # Generate visual output
+        visuals = generate_visual_from_music(file_path)
+        
+        # Clean up temporary file
+        os.remove(file_path)
+        
+        return {"visuals": visuals}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

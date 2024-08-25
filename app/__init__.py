@@ -1,9 +1,14 @@
 from fastapi import FastAPI
+import logging
+from app.main import api_router  # Correctly import the router instance
+
+# Initialize logging for the application
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+logger.info("App module initialized")
 
 app = FastAPI()
 
-# Import the routes
-from .main import api_router
-
 # Add routes to the app
-app.include_router(api_router)
+app.include_router(api_router)  # Include the router instance correctly
